@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-
 
 
 /**
@@ -66,10 +64,10 @@ public class SQLiteUtility {
 	}
 	
 	
-	// This retrieves and returns a list of 
-	public static List<Event> retrieveEventsFromDatabase() { 
+	// This retrieves and returns a list of events
+	public static ArrayList<Event> retrieveEventsFromDatabase() { 
 
-		final List<Event> events = new ArrayList<>();
+		final ArrayList<Event> events = new ArrayList<>();
 		
 		// Initialize objects
 		Statement statement = null;
@@ -101,8 +99,8 @@ public class SQLiteUtility {
 		         // Retrieve by column names
 		         e.eventID = resultSet.getString("EventID");
 		         e.eventName = resultSet.getString("EventName");
-		         e.setEventDate = resultSet.getDate("EventDescription");
-		         e.setEventTime = resultSet.getString("EventTime");
+		         e.eventDate = resultSet.getDate("EventDate");
+		         e.eventTime = resultSet.getString("EventTime");
 		         
 		         final int R = resultSet.getInt("EventRecur");
 		         if (R == 0) {
@@ -229,7 +227,7 @@ public class SQLiteUtility {
 		    preparedStatement.setBlob(5, event.getEventRecur);
 		    preparedStatement.setString(6, event.getEventRecurFreq);
 		    preparedStatement.setString(7, event.getEventStart);
-		    preparedStatement.setInt(8, event.getEventEnd);
+		    preparedStatement.setString(8, event.getEventEnd);
 		    preparedStatement.setInt(9, event.getEventPriority);
 		    preparedStatement.setInt(10, event.getEventLimited);
 		    preparedStatement.setInt(11, event.getEventCategory);
@@ -254,4 +252,4 @@ public class SQLiteUtility {
 		}
 
 	}
-	}
+}

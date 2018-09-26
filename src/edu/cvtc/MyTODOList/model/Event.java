@@ -1,22 +1,23 @@
-package edu.cvtc.MyTODOList;
+package edu.cvtc.MyTODOList.model;
 
 public class Event 
 {
-	private int eventID;
-	private String eventName;
-	private String eventDate;
-	private String eventTime;
-	private boolean eventRecur;
-	private String eventStart;
-	private String eventEnd;
-	private int eventPriority;
-	private boolean eventLimited;
-	private String eventCategory;
-	private boolean eventReminder;
-	private String eventReminderTime;
+	protected int eventID;
+	protected String eventName;
+	protected String eventDesc;
+	protected String eventDate;
+	protected String eventTime;
+	protected boolean eventRecur;
+	protected String eventStart;
+	protected String eventEnd;
+	protected int eventPriority;
+	protected boolean eventLimited;
+	protected String eventCategory;
+	protected boolean eventReminder;
+	protected String eventReminderTime;
 	
 
-	private enum eventRecurFreq
+	protected enum eventRecurFreq
 	{
 		
 	}
@@ -43,7 +44,16 @@ public class Event
 	{
 		this.eventName = eventName;
 	}
+	
+	public String getEventDesc()
+	{
+		return eventDesc;
+	}
 
+	public void setEventDesc(String eventDesc)
+	{
+		this.eventDesc = eventDesc;
+	}
 
 	public String getEventDate() 
 	{
