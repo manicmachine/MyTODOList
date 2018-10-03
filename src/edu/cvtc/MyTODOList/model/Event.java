@@ -17,7 +17,7 @@ public class Event
 	protected boolean eventReminder;
 	protected String eventReminderTime;
 	
-	protected enum EventRecurFreq
+	public enum EventRecurFreq
 	{
 		DAILY, WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
 	}
@@ -92,7 +92,7 @@ public class Event
 
 	public EventRecurFreq getEventFrequency()
 	{
-		return this.eventFrequency
+		return this.eventFrequency;
 	}
 
 	public void setEventFrequency(EventRecurFreq freq)

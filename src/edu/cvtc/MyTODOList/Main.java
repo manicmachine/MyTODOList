@@ -3,6 +3,7 @@ package edu.cvtc.MyTODOList;
 import java.util.Scanner;
 
 import edu.cvtc.MyTODOList.model.Event;
+import edu.cvtc.MyTODOList.model.Event.EventRecurFreq;
 
 import java.util.ArrayList;
 import java.time.DayOfWeek;
@@ -124,6 +125,7 @@ public class Main {
 		Event tempEvent = new Event();
 		System.out.println("<-- Event Creation -->");
 		
+		outerloop: 
 		do {
 			System.out.print(">> Enter event name: ");
 			tempEvent.setEventName(scanner.nextLine());
@@ -141,7 +143,7 @@ public class Main {
 					tempEvent.setEventDate(tmpDate.format(dateFormat).toString());
 					break;
 				} catch (DateTimeParseException e) {
-					System.out.println("Invalid date. Please enter your date in the format YYYY-MM-DD. \n"
+					System.out.println("Invalid date. Please enter your date in the format MM-DD-YYYY. \n"
 							+ "Today's date is " + LocalDate.now().format(dateFormat).toString());
 				}
 			} while(true);
@@ -160,7 +162,7 @@ public class Main {
 			} while(true);
 			System.out.println();
 			
-			System.out.print(">> Does this event reoccur (Y/N)? ")
+			System.out.print(">> Does this event reoccur (Y/N)? ");
 			input = scanner.nextLine().toString().toLowerCase();
 
 			if (input.equals("y") || input.equals("yes")) {
@@ -169,26 +171,26 @@ public class Main {
 				System.out.println(">> How often should this event reoccur?");
 				
 				for (EventRecurFreq day: EventRecurFreq.values()) {
-					System.out.println(day)
+					System.out.println(day);
 				}
 
 				do {
 					System.out.print(">> Select one of the above: ");
 
-					input = scanner.nextLine().toString().toLowerCase();
+					input = scanner.nextLine().toString().toUpperCase();
 					for (EventRecurFreq day : EventRecurFreq.values()) {
-						if (input.equals(day.toString()) {
-							tempEvent.setEventFreq(input);
+						if (input.equals(day.toString())) {
+							tempEvent.setEventFrequency(day);
 						}
 					}
 
-					if (null == tempEvent.getEventReq()) {
-						System.out.println("Invalid selection. Please choose one of the above options.")
+					if (null == tempEvent.getEventFrequency()) {
+						System.out.println("Invalid selection. Please choose one of the above options.");
 					} else {
 						break;
 					}
 
-				} while(true)
+				} while(true);
 
 			} else {
 				tempEvent.setEventRecur(false);
@@ -196,7 +198,7 @@ public class Main {
 
 			System.out.print(">> Set event priority (1-10, 1: Not very important, 10: Very important): ");
 			input = scanner.nextLine();
-			validateInput(input, 1, 10);
+			tempEvent.setEventPriority(validateInput(input, 1, 10));
 			
 			System.out.println(">> Current event:");
 			displayEvent(tempEvent);
@@ -206,6 +208,33 @@ public class Main {
 			input = scanner.nextLine().toString().toLowerCase();
 			
 			if (input.equals("y") || input.equals("yes")) {
+				
+				for (Event event : events) {
+					if (tempEvent.getEventDate().equals(event.getEventDate())) {
+						if (tempEvent.getEventTime().equals(event.getEventTime())) {
+							
+							// If event occurs at the same time as another event, ask the user if they want to schedule 
+							// two events at the same time
+							System.out.print("You already have an event that occurs at this time: \"" + event.getEventName() 
+							+ "\". Would you still like to add this event (Y/N)? ");
+							input = scanner.nextLine().toString().toLowerCase();
+							
+							if (input.equals("y") || input.equals("yes")) {
+								events.add(tempEvent);
+								break outerloop;
+							} else {
+								break outerloop;
+							}
+						}
+					} 
+					
+					// If event doesn't occur on the same date as another, add the event
+					else {
+						events.add(tempEvent);
+						break outerloop;
+					}
+				}
+				
 				events.add(tempEvent);
 				break;
 			}
@@ -257,9 +286,9 @@ public class Main {
 				+ "Event Description: " + event.getEventDesc() + "\n"
 				+ "Event Date: " + event.getEventDate() + "\n"
 				+ "Event Time: " + event.getEventTime() + "\n"
-				+ "Reoccuring: " + event.getEventRecur() + "\n"
-				+ "Reoccuring frequency: " + event.getEventFreq() + "\n"
-				+ "Priority: " + event.getPriority() + "\n"
+				+ "Reoccuring: " + event.isEventRecur() + "\n"
+				+ "Reoccuring frequency: " + event.getEventFrequency() + "\n"
+				+ "Priority: " + event.getEventPriority() + "\n"
 				+ "\n");
 	}
 	
