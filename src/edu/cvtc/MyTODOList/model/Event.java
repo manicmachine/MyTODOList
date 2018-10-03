@@ -8,6 +8,7 @@ public class Event
 	protected String eventDate;
 	protected String eventTime;
 	protected boolean eventRecur;
+	protected EventRecurFreq eventFrequency;
 	protected String eventStart;
 	protected String eventEnd;
 	protected int eventPriority;
@@ -16,8 +17,7 @@ public class Event
 	protected boolean eventReminder;
 	protected String eventReminderTime;
 	
-
-	protected enum eventRecurFreq
+	protected enum EventRecurFreq
 	{
 		DAILY, WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
 	}
@@ -88,6 +88,16 @@ public class Event
 	public void setEventRecur(boolean eventRecur) 
 	{
 		this.eventRecur = eventRecur;
+	}
+
+	public EventRecurFreq getEventFrequency()
+	{
+		return this.eventFrequency
+	}
+
+	public void setEventFrequency(EventRecurFreq freq)
+	{
+		this.eventFrequency = freq;
 	}
 
 
