@@ -19,7 +19,7 @@ public class Event
 
 	protected enum eventRecurFreq
 	{
-		
+		DAILY, WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
 	}
 	
 	public int getEventID() 

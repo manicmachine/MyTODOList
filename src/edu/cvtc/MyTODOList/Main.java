@@ -23,6 +23,8 @@ public class Main {
 	static int userSelection = 0;
 	static Scanner scanner = new Scanner(System.in);
 	static ArrayList<Event> events = new ArrayList<Event>();
+	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 	
 	public static void main(String[] args) {
 		
@@ -51,7 +53,7 @@ public class Main {
 	// Returns an int to be used to invoke the function associated with the provided action.
 	public static int mainMenu() {
 		do {
-			System.out.print("Select the desired action:\n"
+			System.out.print(">> Select the desired action:\n"
 					+ "\n"
 					+ "1 - View Events\n"
 					+ "2 - Add Event\n"
@@ -71,7 +73,7 @@ public class Main {
 	// Prompt user to select a specific day, week, month, or provided date range which the user wishes to view.
 	public static void viewEventsMenu() {
 		do {
-			System.out.print("Select timeframe to view:\n"
+			System.out.print(">> Select timeframe to view:\n"
 					+ "\n"
 					+ "1 - View Today\n"
 					+ "2 - View This Week\n"
@@ -86,19 +88,27 @@ public class Main {
 		
 		switch(userSelection) {
 			case(1): // View today
-				for (Event event : events) {
-					// If the date of the current event is the same as today, display the event.
-					if (LocalDate.parse((CharSequence) event.getEventDate()).equals(LocalDate.now())) {
-						displayEvent(event);
+				if (events.size() == 0) {
+					System.out.println(">> You have no events scheduled.");
+				} else {
+					for (Event event : events) {
+						// If the date of the current event is the same as today, display the event.
+						if (LocalDate.parse((CharSequence) event.getEventDate(), dateFormat).equals(LocalDate.now())) {
+							displayEvent(event);
+						}
 					}
 				}
 				break;
 			case(2): // View this week
-				for (Event event : events) {
-					// If the date of the current event is between this weeks Monday and Sunday, display the event.
-					if (LocalDate.parse((CharSequence) event.getEventDate()).isAfter(LocalDate.now().with(DayOfWeek.MONDAY)) &&
-							LocalDate.parse((CharSequence) event.getEventDate()).isBefore(LocalDate.now().with(DayOfWeek.SUNDAY))) {
-						displayEvent(event);
+				if (events.size() == 0) {
+					System.out.println(">> You have no events scheduled.");
+				} else {
+					for (Event event : events) {
+						// If the date of the current event is between this weeks Monday and Sunday, display the event.
+						if (LocalDate.parse((CharSequence) event.getEventDate(), dateFormat).isAfter(LocalDate.now().with(DayOfWeek.MONDAY)) &&
+								LocalDate.parse((CharSequence) event.getEventDate(), dateFormat).isBefore(LocalDate.now().with(DayOfWeek.SUNDAY))) {
+							displayEvent(event);
+						}
 					}
 				}
 				break;
@@ -115,43 +125,46 @@ public class Main {
 		System.out.println("<-- Event Creation -->");
 		
 		do {
-			System.out.print("Enter event name: ");
+			System.out.print(">> Enter event name: ");
 			tempEvent.setEventName(scanner.nextLine());
 			System.out.println();
 			
-			System.out.print("Enter event description: ");
+			System.out.print(">> Enter event description: ");
 			tempEvent.setEventDesc(scanner.nextLine());
 			System.out.println();
 			
-			System.out.print("Enter event date (YYYY-MM-DD): ");
 			do {
+				System.out.print(">> Enter event date (MM-DD-YYYY): ");
+				
 				try { // Attempt to parse entered date, and if successful, exit loop. Otherwise prompt again.
-					tempEvent.setEventDate(LocalDate.parse((CharSequence) scanner.nextLine()).toString());
+					LocalDate tmpDate = LocalDate.parse((CharSequence) scanner.nextLine(), dateFormat);
+					tempEvent.setEventDate(tmpDate.format(dateFormat).toString());
 					break;
 				} catch (DateTimeParseException e) {
 					System.out.println("Invalid date. Please enter your date in the format YYYY-MM-DD. \n"
-							+ "Today's date is " + LocalDate.now().toString());
+							+ "Today's date is " + LocalDate.now().format(dateFormat).toString());
 				}
 			} while(true);
 			System.out.println();
 			
-			System.out.print("Enter event time (HH:mm): ");
+			System.out.print(">> Enter event time in 24h format (HH:mm): ");
 			do {
 				try { // Attempt to parse entered date, and if successful, exit loop. Otherwise prompt again.
-					tempEvent.setEventTime(LocalTime.parse((CharSequence) scanner.nextLine() + ":00", DateTimeFormatter.ofPattern("H:mm:ss")).toString());
+					LocalTime tmpTime = LocalTime.parse((CharSequence) scanner.nextLine(), timeFormat);
+					tempEvent.setEventTime(tmpTime.format(timeFormat).toString());
 					break;
 				} catch (DateTimeParseException e) {
 					System.out.println("Invalid time. Please enter your time in the 24h format HH:mm. \n"
-							+ "The current time is " + LocalTime.now().withSecond(0).withNano(0).toString());
+							+ "The current time is " + LocalTime.now().withSecond(0).withNano(0).format(timeFormat).toString());
 				}
 			} while(true);
 			System.out.println();
 			
-			System.out.println("Current event:");
+			System.out.println(">> Current event:");
 			displayEvent(tempEvent);
 			
 			// Ask user if the event is correct. If so, add tempEvent to events and exit loop. Otherwise do it again.
-			System.out.print("Is this correct (Y/N)? ");
+			System.out.print(">> Is this correct (Y/N)? ");
 			input = scanner.nextLine().toString().toLowerCase();
 			
 			if (input.equals("y") || input.equals("yes")) {
@@ -200,7 +213,7 @@ public class Main {
 //	}
 	// Display a single event.
 	public static void displayEvent(Event event) {
-		System.out.println("Event: " + event.getEventName() + "\n"
+		System.out.println(">> Event: " + event.getEventName() + "\n"
 				+ "Event Description: " + event.getEventDesc() + "\n"
 				+ "Event Date: " + event.getEventDate() + "\n"
 				+ "Event Time: " + event.getEventTime() + "\n"
@@ -222,12 +235,12 @@ public class Main {
 			if (temp >= minValue && temp <= maxValue) {
 				return temp;
 			} else {
-				System.out.println("Please enter a valid selection (" + Integer.toString(minValue) + "-" + Integer.toString(maxValue) + ").");
+				System.out.println(">> Please enter a valid selection (" + Integer.toString(minValue) + "-" + Integer.toString(maxValue) + ").");
 				return 0; 
 			}
 			
 		} catch (NumberFormatException exception) {
-			System.out.println("Invalid action provided. Please enter a valid selection (" + Integer.toString(minValue) + "-" + Integer.toString(maxValue) + ")");
+			System.out.println(">> Invalid action provided. Please enter a valid selection (" + Integer.toString(minValue) + "-" + Integer.toString(maxValue) + ")");
 			return 0;
 		}	
 	}
