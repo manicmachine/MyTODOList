@@ -160,6 +160,44 @@ public class Main {
 			} while(true);
 			System.out.println();
 			
+			System.out.print(">> Does this event reoccur (Y/N)? ")
+			input = scanner.nextLine().toString().toLowerCase();
+
+			if (input.equals("y") || input.equals("yes")) {
+
+				tempEvent.setEventRecur(true);
+				System.out.println(">> How often should this event reoccur?");
+				
+				for (EventRecurFreq day: EventRecurFreq.values()) {
+					System.out.println(day)
+				}
+
+				do {
+					System.out.print(">> Select one of the above: ");
+
+					input = scanner.nextLine().toString().toLowerCase();
+					for (EventRecurFreq day : EventRecurFreq.values()) {
+						if (input.equals(day.toString()) {
+							tempEvent.setEventFreq(input);
+						}
+					}
+
+					if (null == tempEvent.getEventReq()) {
+						System.out.println("Invalid selection. Please choose one of the above options.")
+					} else {
+						break;
+					}
+
+				} while(true)
+
+			} else {
+				tempEvent.setEventRecur(false);
+			}
+
+			System.out.print(">> Set event priority (1-10, 1: Not very important, 10: Very important): ");
+			input = scanner.nextLine();
+			validateInput(input, 1, 10);
+			
 			System.out.println(">> Current event:");
 			displayEvent(tempEvent);
 			
@@ -173,6 +211,8 @@ public class Main {
 			}
 			
 		} while(true);
+
+		//TODO: Sort events based upon their priority.
 	}
 	
 	// Prompt user to provide an event to edit, then display event edit prompts. 
@@ -217,6 +257,9 @@ public class Main {
 				+ "Event Description: " + event.getEventDesc() + "\n"
 				+ "Event Date: " + event.getEventDate() + "\n"
 				+ "Event Time: " + event.getEventTime() + "\n"
+				+ "Reoccuring: " + event.getEventRecur() + "\n"
+				+ "Reoccuring frequency: " + event.getEventFreq() + "\n"
+				+ "Priority: " + event.getPriority() + "\n"
 				+ "\n");
 	}
 	
