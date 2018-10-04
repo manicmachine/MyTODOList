@@ -8,7 +8,7 @@ public class Event
 	protected String eventDate;
 	protected String eventTime;
 	protected boolean eventRecur;
-	protected EventRecurFreq eventFrequency;
+	protected String eventFrequency;
 	protected String eventStart;
 	protected String eventEnd;
 	protected int eventPriority;
@@ -90,12 +90,12 @@ public class Event
 		this.eventRecur = eventRecur;
 	}
 
-	public EventRecurFreq getEventFrequency()
+	public String getEventFrequency()
 	{
 		return this.eventFrequency;
 	}
 
-	public void setEventFrequency(EventRecurFreq freq)
+	public void setEventFrequency(String freq)
 	{
 		this.eventFrequency = freq;
 	}
