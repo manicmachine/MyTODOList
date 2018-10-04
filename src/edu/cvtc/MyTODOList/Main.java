@@ -180,7 +180,7 @@ public class Main {
 					input = scanner.nextLine().toString().toUpperCase();
 					for (EventRecurFreq day : EventRecurFreq.values()) {
 						if (input.equals(day.toString())) {
-							tempEvent.setEventFrequency(day.toString());
+							tempEvent.setEventFrequency(day);
 						}
 					}
 
