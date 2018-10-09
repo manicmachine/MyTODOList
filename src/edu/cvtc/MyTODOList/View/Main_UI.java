@@ -13,12 +13,19 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Button;
 import javax.swing.JSplitPane;
 import java.awt.Panel;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import java.awt.FlowLayout;
 import java.awt.Component;
 import javax.swing.JButton;
 import javax.swing.border.BevelBorder;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+
+import edu.cvtc.MyTODOList.model.Event;
+
 import java.awt.Canvas;
 import javax.swing.SwingConstants;
 import javax.swing.JSpinner;
@@ -34,11 +41,24 @@ public class Main_UI extends JFrame {
 
 	private JPanel contentPane;
 	private JTable table;
+	static LocalDate today;
+	static String month;
+	static int numOfDays;
+	static ArrayList<Event> events = new ArrayList<Event>();
+	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+
+		today = LocalDate.now();
+		month = today.getMonth().toString();
+		numOfDays = today.lengthOfMonth();
+
+		
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -116,12 +136,14 @@ public class Main_UI extends JFrame {
 		contentPane.add(EventList);
 		
 		JTextPane MonthLbl = new JTextPane();
-		MonthLbl.setForeground(Color.MAGENTA);
-		MonthLbl.setBackground(Color.PINK);
+		MonthLbl.setForeground(Color.BLACK);
+		MonthLbl.setBackground(new Color(0, 0, 0, 0)); // Transparent background
 		MonthLbl.setFont(new Font("Tahoma", Font.BOLD, 60));
 		MonthLbl.setEditable(false);
-		MonthLbl.setText("MONTH\r\n");
+		MonthLbl.setText(month + "\r\n");
 		MonthLbl.setBounds(527, 51, 235, 76);
+		// Adjust pane size according to how long the month's spelling is.
+		MonthLbl.setSize(month.length() * 42, 200);
 		
 		contentPane.add(MonthLbl);
 	}
