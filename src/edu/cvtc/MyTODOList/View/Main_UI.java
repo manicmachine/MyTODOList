@@ -193,14 +193,9 @@ public class Main_UI extends JFrame {
 		});
 		
 		
-		JTextPane monthLbl = new JTextPane();
-		monthLbl.setForeground(Color.BLACK);
-		monthLbl.setBackground(new Color(0, 0, 0, 0)); // Transparent background
-		monthLbl.setFont(new Font("Tahoma", Font.BOLD, 60));
-		monthLbl.setEditable(false);
-		monthLbl.setText(month + "\r\n");
+		JLabel monthLbl = new JLabel(month.toString());
 		monthLbl.setBounds(527, 51, 235, 76);
-		monthLbl.setSize(month.length() * 42, 200); // Adjust pane size according to how long the month's spelling is.
+		monthLbl.setFont(new Font("Tahoma", Font.BOLD, 24));
 		
 		contentPane.add(monthLbl);
 	}
