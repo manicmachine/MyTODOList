@@ -123,6 +123,7 @@ public class Main_UI extends JFrame {
 				{null, null, null, null, null, null, ""},
 				{null, null, null, null, null, null, null},
 				{null, null, null, null, null, null, null},
+				{null, null, null, null, null, null, null}
 			},
 			new String[] {
 				"New column", "New column", "New column", "New column", "New column", "New column", "Events"
