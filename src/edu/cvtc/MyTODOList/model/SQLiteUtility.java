@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import edu.cvtc.MyTODOList.model.Event.EventRecurFreq;
+
 
 /**
  * @author matt
@@ -129,7 +131,7 @@ public class SQLiteUtility {
 		         }
 		         
 		         // Unsure if the eventRecurFreq will be a Blob type property
-			     e.eventFrequency = resultSet.getString("EventRecurFreq");
+			     e.eventFrequency = EventRecurFreq.valueOf(resultSet.getString("EventRecurFreq"));
 		         e.eventStart = resultSet.getString("EventStartTime");
 		         e.eventEnd = resultSet.getString("EventEndTime");
 		         
@@ -226,7 +228,7 @@ public class SQLiteUtility {
 			        	 e.setEventRecur(true);
 			         }
 			         
-				     e.eventFrequency = resultSet.getString("EventRecurFreq");
+				     e.eventFrequency = EventRecurFreq.valueOf(resultSet.getString("EventRecurFreq"));
 				     
 			         e.eventStart = resultSet.getString("EventStartTime");
 			         e.eventEnd = resultSet.getString("EventEndTime");
@@ -364,7 +366,7 @@ public class SQLiteUtility {
 		    	}
 		    
 			preparedStatement.setInt(5, ER); 
-		    preparedStatement.setString(6, event.eventFrequency);
+		    preparedStatement.setString(6, event.eventFrequency.toString());
 		    preparedStatement.setString(7, event.getEventStart());
 		    preparedStatement.setString(8, event.getEventEnd());
 		    preparedStatement.setInt(9, event.getEventPriority());
