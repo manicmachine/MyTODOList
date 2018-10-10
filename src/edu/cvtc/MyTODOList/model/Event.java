@@ -12,8 +12,8 @@ public class Event
 	protected String eventStart;
 	protected String eventEnd;
 	protected int eventPriority;
-	protected boolean eventLimited;
-	protected String eventCategory;
+	protected boolean eventLimited = false;
+	protected String eventCategory = "None";
 	protected boolean eventReminder;
 	protected String eventReminderTime;
 	
@@ -28,6 +28,15 @@ public class Event
 				+ "Event Date: " + this.getEventDate() + "\n"
 				+ "Event Time: " + this.getEventTime() + "\n"
 				+ "Priority: " + this.getEventPriority() + "\n\n";
+	}
+	
+	public String eventDetails() {
+		return "Event: " + this.getEventName() + "\n"
+				+ "Event Description: " + this.getEventDesc() + "\n"
+				+ "Event Date: " + this.getEventDate() + "\n"
+				+ "Event Time: " + this.getEventTime() + "\n"
+				+ "Priority: " + this.getEventPriority() + "\n"
+				+ "Category: " + this.getEventCategory();
 	}
 	
 	public int getEventID() 
