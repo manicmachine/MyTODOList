@@ -8,7 +8,7 @@ public class Event
 	protected String eventDate;
 	protected String eventTime;
 	protected boolean eventRecur;
-	protected String eventFrequency;
+	protected EventRecurFreq eventFrequency;
 	protected String eventStart;
 	protected String eventEnd;
 	protected int eventPriority;
@@ -20,6 +20,14 @@ public class Event
 	public enum EventRecurFreq
 	{
 		DAILY, WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
+	}
+	
+	@Override
+	public String toString() {
+		return "Event: " + this.getEventName() + "\n"
+				+ "Event Date: " + this.getEventDate() + "\n"
+				+ "Event Time: " + this.getEventTime() + "\n"
+				+ "Priority: " + this.getEventPriority() + "\n\n";
 	}
 	
 	public int getEventID() 
@@ -90,12 +98,12 @@ public class Event
 		this.eventRecur = eventRecur;
 	}
 
-	public String getEventFrequency()
+	public EventRecurFreq getEventFrequency()
 	{
 		return this.eventFrequency;
 	}
 
-	public void setEventFrequency(String freq)
+	public void setEventFrequency(EventRecurFreq freq)
 	{
 		this.eventFrequency = freq;
 	}
