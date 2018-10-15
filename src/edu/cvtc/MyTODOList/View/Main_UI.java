@@ -9,12 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import java.awt.GridLayout;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -23,44 +20,33 @@ import java.awt.Color;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
-import java.awt.FlowLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 
 import javax.swing.JButton;
-import javax.swing.border.BevelBorder;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import edu.cvtc.MyTODOList.model.Event;
 import edu.cvtc.MyTODOList.model.Event.EventRecurFreq;
 
-import java.awt.Canvas;
-import javax.swing.SwingConstants;
-import javax.swing.JSpinner;
+
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
+import javax.swing.JOptionPane;
 import java.awt.Font;
-import javax.swing.JTextPane;
-import javax.swing.ListModel;
 
-import org.jdatepicker.DateModel;
-import org.jdatepicker.JDatePicker;
-import org.jdatepicker.UtilDateModel;
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.github.lgooddatepicker.components.TimePicker;
+import com.github.lgooddatepicker.components.TimePickerSettings;
 
 public class Main_UI extends JFrame {
 
@@ -114,7 +100,7 @@ public class Main_UI extends JFrame {
 		table = new JTable();
 		table.setBounds(80, 120, 920, 680);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setBorder(null);
+		table.setBorder(new EmptyBorder(5, 5, 5, 5));
 		table.setAlignmentX(Component.LEFT_ALIGNMENT);
 		table.setAlignmentY(Component.TOP_ALIGNMENT);
 		table.setModel(new DefaultTableModel(
@@ -141,6 +127,8 @@ public class Main_UI extends JFrame {
 		JTextArea eventDetails = new JTextArea();
 		eventDetails.setBounds(1040, 600, 240, 150);
 		eventDetails.setEditable(false);
+		eventDetails.setWrapStyleWord(true);
+		eventDetails.setLineWrap(true);
 		contentPane.add(eventDetails);
 		
 		JPanel eventDetailsButtonPanel = new JPanel();
@@ -219,12 +207,14 @@ public class Main_UI extends JFrame {
 		eventDesc.setWrapStyleWord(true);
 		
 		JLabel eventDateLabel = new JLabel("Event Date:");
-	
-		UtilDateModel model = new UtilDateModel();
-		JDatePicker eventDatePicker = new JDatePicker(model);
+		DatePickerSettings eventDatePickerSettings = new DatePickerSettings();
+		eventDatePickerSettings.setAllowKeyboardEditing(false);
+		DatePicker eventDatePicker = new DatePicker(eventDatePickerSettings);
 		
-		JLabel eventTimeLabel = new JLabel("Event Time (24h):");
-		JTextField eventTime = new JTextField(4);
+		JLabel eventTimeLabel = new JLabel("Event Time:");
+		TimePickerSettings eventTimeSettings = new TimePickerSettings();
+		eventTimeSettings.setAllowKeyboardEditing(false);
+		TimePicker eventTime = new TimePicker(eventTimeSettings);
 		
 		JLabel frequencyLabel = new JLabel("How frequently?");
 		JComboBox frequencyList = new JComboBox(Event.EventRecurFreq.values());
@@ -269,27 +259,28 @@ public class Main_UI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Event newEvent = new Event();
-				DateModel dateModel = eventDatePicker.getModel();
-				int eventMonth = dateModel.getMonth() + 1; // JDatePicker 0-indexes the month so need to add 1
-				int eventDay = dateModel.getDay();
-				int eventYear = dateModel.getYear();
-				LocalDate eventLocalDate = LocalDate.of(eventYear, eventMonth, eventDay);
 				
-				newEvent.setEventName(eventName.getText());
-				newEvent.setEventDesc(eventDesc.getText());
-				newEvent.setEventDate(eventLocalDate.format(dateFormat).toString());
-				newEvent.setEventTime(eventTime.getText());
-				newEvent.setEventPriority(priority.getValue());
-				
-				if (yesReoccurBtn.isSelected()) {
-					newEvent.setEventRecur(true);
-					newEvent.setEventFrequency((EventRecurFreq) frequencyList.getSelectedItem());
+				if (eventName.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(dialog, "Please provide an event name.", "Missing event name", JOptionPane.ERROR_MESSAGE);
+				} else if (eventDatePicker.toString().isEmpty()){
+					JOptionPane.showMessageDialog(dialog, "Please provide a starting event date.", "Missing event date", JOptionPane.ERROR_MESSAGE);
+				} else {
+					newEvent.setEventName(eventName.getText());
+					newEvent.setEventDesc(eventDesc.getText());
+					newEvent.setEventDate(eventDatePicker.getDate().format(dateFormat).toString());
+					newEvent.setEventTime(eventTime.getTimeStringOrEmptyString());
+					newEvent.setEventPriority(priority.getValue());
+					
+					if (yesReoccurBtn.isSelected()) {
+						newEvent.setEventRecur(true);
+						newEvent.setEventFrequency((EventRecurFreq) frequencyList.getSelectedItem());
+					}
+					
+					events.add(newEvent);
+					updateEventsList(list);
+					dialog.dispose();
 				}
-				
-				System.out.println(newEvent.toString());
-				events.add(newEvent);
-				updateEventsList(list);
-				dialog.dispose();
+
 			}
 		});
 		
