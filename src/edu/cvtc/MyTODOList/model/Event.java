@@ -24,10 +24,7 @@ public class Event
 	
 	@Override
 	public String toString() {
-		return "Event: " + this.getEventName() + "\n"
-				+ "Event Date: " + this.getEventDate() + "\n"
-				+ "Event Time: " + this.getEventTime() + "\n"
-				+ "Priority: " + this.getEventPriority() + "\n\n";
+		return this.getEventTime() + " - " + this.getEventName();
 	}
 	
 	public String eventDetails() {

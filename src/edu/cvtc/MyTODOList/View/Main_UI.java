@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -21,13 +22,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
 import java.awt.Component;
+import java.awt.Container;
 
 import javax.swing.JButton;
 
@@ -52,31 +57,40 @@ public class Main_UI extends JFrame {
 
 	private JPanel contentPane;
 	private JTable table;
-	static LocalDate today;
-	static String month;
-	static int year;
 	static int numOfDays;
+	static int realDay, realMonth, realYear, currentMonth, currentYear;
 	static ArrayList<Event> events = new ArrayList<Event>();
 	static DefaultListModel eventModel = new DefaultListModel();
 	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
+	static JLabel yearLabel;
+	static JButton previousBtn, nextBtn;
+	static JTable calendarTable;
+	static JComboBox yearList;
+	static DefaultTableModel calendarModel;
+	static JScrollPane calendarScroll;
+	static JPanel calendarPanel;
+	static Main_UI mainFrame;
+	static GregorianCalendar calendar = new GregorianCalendar();
+	static String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-
-		today = LocalDate.now();
-		month = today.getMonth().toString();
-		year = today.getYear();
-		numOfDays = today.lengthOfMonth();
+		
+		realDay = calendar.get(GregorianCalendar.DAY_OF_MONTH);
+		realMonth = calendar.get(GregorianCalendar.MONTH);
+		realYear = calendar.get(GregorianCalendar.YEAR);
+		currentMonth = realMonth;
+		currentYear = realYear;	
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main_UI frame = new Main_UI();
-					frame.setResizable(false);
-					frame.setVisible(true);
+					mainFrame = new Main_UI();
+					mainFrame.setResizable(false);
+					mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -97,38 +111,146 @@ public class Main_UI extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		table = new JTable();
-		table.setBounds(80, 120, 920, 680);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setBorder(new EmptyBorder(5, 5, 5, 5));
-		table.setAlignmentX(Component.LEFT_ALIGNMENT);
-		table.setAlignmentY(Component.TOP_ALIGNMENT);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null, null, null, null, ""},
-				{null, null, null, null, null, null, ""},
-				{null, null, null, null, null, null, null},
-				{null, null, null, null, null, null, null},
-				{null, null, null, null, null, null, null}
-			},
-			new String[] {
-				"New column", "New column", "New column", "New column", "New column", "New column", "Events"
-			}
-		));
-		table.setCellSelectionEnabled(true);
-		table.setBackground(Color.LIGHT_GRAY);
-		table.setRowHeight(136);
-		contentPane.add(table);
+		JLabel monthLbl = new JLabel(monthNames[currentMonth]);
+		monthLbl.setBounds(500, 50, 235, 76);
+		monthLbl.setFont(new Font("Tahoma", Font.BOLD, 24));
 		
+		contentPane.add(monthLbl);
+		
+		// Initialize and configure main calendar
+		yearLabel = new JLabel("Year:");
+		yearList = new JComboBox();
+		previousBtn = new JButton("<--");
+		nextBtn = new JButton("-->");
+		calendarModel = new DefaultTableModel() {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		
+		calendarTable = new JTable(calendarModel);
+		calendarScroll = new JScrollPane(calendarTable);
+		calendarPanel = new JPanel(null);
+
+		calendarPanel.add(yearLabel);
+		calendarPanel.add(yearList);
+		calendarPanel.add(previousBtn);
+		calendarPanel.add(nextBtn);
+		calendarPanel.add(calendarScroll);
+		
+		calendarPanel.setBounds(80, 120, 920, 680);
+		yearLabel.setBounds(400, 0, 80, 25);
+		yearList.setBounds(460 - yearList.getPreferredSize().width / 2, 0, 120, 25);
+		previousBtn.setBounds(10, 0, 50, 25);
+		nextBtn.setBounds(870, 0, 50, 25);
+		calendarScroll.setBounds(10, 25, 920, 650);
+		
+		for (int i = realYear - 5; i <= realYear + 5; i++) {
+			yearList.addItem(String.valueOf(i));
+		}
+		yearList.setSelectedIndex(5);
+		
+		String[] headers = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+		for (int i = 0; i < 7; i++) {
+			calendarModel.addColumn(headers[i]);
+		}
+		
+		calendarTable.getTableHeader().setResizingAllowed(false);
+		calendarTable.getTableHeader().setReorderingAllowed(false);
+		calendarTable.setColumnSelectionAllowed(true);
+		calendarTable.setRowSelectionAllowed(true);
+		calendarTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		calendarTable.setRowHeight(120);
+		
+		calendarModel.setColumnCount(7);
+		calendarModel.setRowCount(6);
+		
+		refreshCalendar(realMonth, realYear);
+		
+		previousBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentMonth == 0) {
+					currentMonth = 11;
+					currentYear -= 1;
+				} else {
+					currentMonth -= 1;
+				}
+				
+				monthLbl.setText(monthNames[currentMonth]);
+				refreshCalendar(currentMonth, currentYear);
+				
+			}
+		});
+		
+		nextBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentMonth == 11) {
+					currentMonth = 0;
+					currentYear += 1;
+				} else {
+					currentMonth += 1;
+				}
+				
+				monthLbl.setText(monthNames[currentMonth]);
+
+				refreshCalendar(currentMonth, currentYear);
+				
+			}
+		});
+		
+		yearList.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (yearList.getSelectedItem() != null) {
+					currentYear = Integer.parseInt(yearList.getSelectedItem().toString());
+					refreshCalendar(currentMonth, currentYear);
+				}
+				
+			}
+		});
+		
+		contentPane.add(calendarPanel);
+//		table = new JTable();
+//		table.setBounds(80, 120, 920, 680);
+//		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		table.setBorder(new EmptyBorder(5, 5, 5, 5));
+//		table.setAlignmentX(Component.LEFT_ALIGNMENT);
+//		table.setAlignmentY(Component.TOP_ALIGNMENT);
+//		table.setModel(new DefaultTableModel(
+//			new Object[][] {
+//				{null, null, null, null, null, null, ""},
+//				{null, null, null, null, null, null, ""},
+//				{null, null, null, null, null, null, null},
+//				{null, null, null, null, null, null, null},
+//				{null, null, null, null, null, null, null}
+//			},
+//			new String[] {
+//				"New column", "New column", "New column", "New column", "New column", "New column", "Events"
+//			}
+//		));
+//		table.setCellSelectionEnabled(true);
+//		table.setBackground(Color.LIGHT_GRAY);
+//		table.setRowHeight(136);
+//		contentPane.add(table);
+		
+
 		JList eventList = new JList(events.toArray());
-		eventList.setBounds(1040, 80, 240, 440);
-		contentPane.add(eventList);
+		JScrollPane eventListScroll = new JScrollPane(eventList);
+		eventListScroll.setBounds(1040, 80, 240, 440);
+		eventListScroll.setBorder(BorderFactory.createTitledBorder("Events"));
+		contentPane.add(eventListScroll);
 		
 		JTextArea eventDetails = new JTextArea();
 		eventDetails.setBounds(1040, 600, 240, 150);
 		eventDetails.setEditable(false);
 		eventDetails.setWrapStyleWord(true);
 		eventDetails.setLineWrap(true);
+		eventDetails.setBorder(BorderFactory.createTitledBorder("Event Details"));
 		contentPane.add(eventDetails);
 		
 		JPanel eventDetailsButtonPanel = new JPanel();
@@ -181,12 +303,6 @@ public class Main_UI extends JFrame {
 			}
 		});
 		
-		
-		JLabel monthLbl = new JLabel(month.toString());
-		monthLbl.setBounds(527, 51, 235, 76);
-		monthLbl.setFont(new Font("Tahoma", Font.BOLD, 24));
-		
-		contentPane.add(monthLbl);
 	}
 	
 	public static void createEventDialog(JFrame parent, JList list) {
@@ -309,7 +425,7 @@ public class Main_UI extends JFrame {
 		
 	}
 	
-	private static void updateEventsList(JList list) {
+	public static void updateEventsList(JList list) {
 		DefaultListModel tempModel = new DefaultListModel();
 		
 		for (Event event: events) {
@@ -320,4 +436,24 @@ public class Main_UI extends JFrame {
 		list.setModel(eventModel);
 	}
 	
+	public static void refreshCalendar(int month, int year) {
+		int numOfDays, startOfMonth;
+		GregorianCalendar newCalendar = new GregorianCalendar(year, month, 1);
+		numOfDays = newCalendar.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+		startOfMonth = newCalendar.get(GregorianCalendar.DAY_OF_WEEK);
+		
+		// Clear calendar
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				calendarModel.setValueAt(null, row, col);
+			}
+		}
+		
+		// Render calendar
+		for (int i = 1; i <= numOfDays; i++) {
+			int row = new Integer((i+startOfMonth-2)/7);
+			int column = (i+startOfMonth-2) % 7;
+			calendarModel.setValueAt(i, row, column);
+		}
+	}
 }
