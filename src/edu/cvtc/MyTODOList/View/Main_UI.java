@@ -21,6 +21,8 @@ import java.awt.Color;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,8 +64,10 @@ public class Main_UI extends JFrame {
 	static int realDay, realMonth, realYear, currentDay, currentMonth, currentYear;
 	static SQLiteUtility sqliteUtility = new SQLiteUtility();
 	static ArrayList<Event> allEvents = new ArrayList<>();
+	static ArrayList<Event> filteredEvents = new ArrayList<>();
 	static DefaultListModel eventModel = new DefaultListModel();
 	static JTextArea eventDetails = new JTextArea();
+	static JList eventList = new JList();
 	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 	static JLabel yearLabel;
@@ -170,13 +174,14 @@ public class Main_UI extends JFrame {
 		calendarTable.getTableHeader().setReorderingAllowed(false);
 		calendarTable.setColumnSelectionAllowed(true);
 		calendarTable.setRowSelectionAllowed(true);
+		calendarTable.setCellSelectionEnabled(true);
 		calendarTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		calendarTable.setRowHeight(120);
 		
 		calendarModel.setColumnCount(7);
 		calendarModel.setRowCount(6);
 		
-		refreshCalendar(realMonth, realYear);
+		refreshCalendar(realDay, realMonth, realYear);
 		
 		previousBtn.addActionListener(new ActionListener() {
 			
@@ -227,6 +232,7 @@ public class Main_UI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (yearList.getSelectedItem() != null) {
 					currentYear = Integer.parseInt(yearList.getSelectedItem().toString());
+					calendarTable.clearSelection();
 					refreshCalendar(currentMonth, currentYear);
 				}
 				
@@ -243,13 +249,15 @@ public class Main_UI extends JFrame {
 				
 				yearList.setSelectedIndex(5);
 				monthLbl.setText(monthNames[currentMonth]);
+				filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
+				updateEventsList(eventList, filteredEvents);
 				refreshCalendar(currentDay, currentMonth, currentYear);
 			}
 		});
 		
 		contentPane.add(calendarPanel);
 
-		JList eventList = new JList(allEvents.toArray());
+		eventList = new JList(allEvents.toArray());
 		JScrollPane eventListScroll = new JScrollPane(eventList);
 		eventListScroll.setBounds(1040, 80, 240, 440);
 		eventListScroll.setBorder(BorderFactory.createTitledBorder("Events"));
@@ -294,10 +302,11 @@ public class Main_UI extends JFrame {
 				System.out.println("Deleting event: " + eventList.getSelectedValue());
 //				sqliteUtility.deleteEventFromDatabase();
 				allEvents.remove(eventList.getSelectedIndex());
+				filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
 				eventDetails.setText("");
 				eventList.clearSelection();
 				deleteBtn.setEnabled(false);
-				updateEventsList(eventList);
+				updateEventsList(eventList, filteredEvents);
 			}
 		});
 		
@@ -323,6 +332,45 @@ public class Main_UI extends JFrame {
 				}
 			}
 		});
+
+		calendarTable.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				System.out.println("Cell selected at: " + calendarTable.rowAtPoint(e.getPoint()) +", " + calendarTable.columnAtPoint(e.getPoint()));
+				if (null != calendarTable.getValueAt(calendarTable.rowAtPoint(e.getPoint()), calendarTable.columnAtPoint(e.getPoint()))) {
+					currentDay = (int) calendarTable.getValueAt(calendarTable.rowAtPoint(e.getPoint()), calendarTable.columnAtPoint(e.getPoint()));
+					filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
+					updateEventsList(eventList, filteredEvents);
+				}
+			}
+		});
+
 		
 	}
 	
@@ -414,12 +462,13 @@ public class Main_UI extends JFrame {
 					}
 					
 					allEvents.add(newEvent);
+					filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
 //					try {
 //						sqliteUtility.writeEventToDatabase(newEvent);
 //					} catch (ClassNotFoundException | SQLException e1) {
 //						System.out.println("Failed to write new event to database. " + e1.toString());
 //					}
-					updateEventsList(list);
+					updateEventsList(list, filteredEvents);
 					dialog.dispose();
 				}
 
@@ -550,7 +599,8 @@ public class Main_UI extends JFrame {
 					}
 					
 					allEvents.set(eventIndex, eventToUpdate);
-					updateEventsList(list);
+					filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
+					updateEventsList(list, filteredEvents);
 					eventDetails.setText("");
 					dialog.dispose();
 				}
@@ -583,10 +633,10 @@ public class Main_UI extends JFrame {
 		
 	}
 	
-	public static void updateEventsList(JList list) {
+	public static void updateEventsList(JList list, ArrayList<Event> events) {
 		DefaultListModel tempModel = new DefaultListModel();
 		
-		for (Event event: allEvents) {
+		for (Event event: events) {
 			tempModel.addElement(event);
 		}
 		
@@ -638,5 +688,20 @@ public class Main_UI extends JFrame {
 		}
 	}
 	
-	
+	public static ArrayList<Event> filterEvents (ArrayList<Event> events, int day, int month, int year) {
+		for (Event event: events) {
+			System.out.println("Beginning array:" + event.getEventDate());
+		}
+		ArrayList<Event> tempEventList = new ArrayList<>();
+		String filterDate = Integer.toString(month + 1) + "-" + Integer.toString(day) + "-" + Integer.toString(year);
+		System.out.println("Filtered date: " + filterDate);
+		for (Event event : events) {
+			if (event.getEventDate().equals(filterDate)) {
+				tempEventList.add(event);
+			}
+		}
+		
+		System.out.println("Filtered array: " + tempEventList.toString());
+		return tempEventList;
+	}
 }
