@@ -191,6 +191,7 @@ public class Main_UI extends JFrame {
 					if (currentMonth == 0) {
 						currentMonth = 11;
 						currentYear -= 1;
+						yearList.setSelectedIndex(yearList.getSelectedIndex() -1);
 					} else {
 						currentMonth -= 1;
 					}
@@ -213,6 +214,7 @@ public class Main_UI extends JFrame {
 					if (currentMonth == 11) {
 						currentMonth = 0;
 						currentYear += 1;
+						yearList.setSelectedIndex(yearList.getSelectedIndex() + 1);
 					} else {
 						currentMonth += 1;
 					}
