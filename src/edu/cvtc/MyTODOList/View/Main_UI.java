@@ -299,7 +299,6 @@ public class Main_UI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Deleting event: " + eventList.getSelectedValue());
 //				sqliteUtility.deleteEventFromDatabase();
 				allEvents.remove(eventList.getSelectedIndex());
 				filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
@@ -362,7 +361,6 @@ public class Main_UI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
-				System.out.println("Cell selected at: " + calendarTable.rowAtPoint(e.getPoint()) +", " + calendarTable.columnAtPoint(e.getPoint()));
 				if (null != calendarTable.getValueAt(calendarTable.rowAtPoint(e.getPoint()), calendarTable.columnAtPoint(e.getPoint()))) {
 					currentDay = (int) calendarTable.getValueAt(calendarTable.rowAtPoint(e.getPoint()), calendarTable.columnAtPoint(e.getPoint()));
 					filteredEvents = filterEvents(allEvents, currentDay, currentMonth, currentYear);
@@ -689,19 +687,14 @@ public class Main_UI extends JFrame {
 	}
 	
 	public static ArrayList<Event> filterEvents (ArrayList<Event> events, int day, int month, int year) {
-		for (Event event: events) {
-			System.out.println("Beginning array:" + event.getEventDate());
-		}
 		ArrayList<Event> tempEventList = new ArrayList<>();
 		String filterDate = Integer.toString(month + 1) + "-" + Integer.toString(day) + "-" + Integer.toString(year);
-		System.out.println("Filtered date: " + filterDate);
 		for (Event event : events) {
 			if (event.getEventDate().equals(filterDate)) {
 				tempEventList.add(event);
 			}
 		}
 		
-		System.out.println("Filtered array: " + tempEventList.toString());
 		return tempEventList;
 	}
 }
