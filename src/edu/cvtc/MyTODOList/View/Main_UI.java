@@ -21,22 +21,22 @@ import java.awt.Color;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
-import java.time.Month;
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
 import java.awt.Component;
-import java.awt.Container;
 
 import javax.swing.JButton;
 
 import edu.cvtc.MyTODOList.model.Event;
+import edu.cvtc.MyTODOList.model.SQLiteUtility;
 import edu.cvtc.MyTODOList.model.Event.EventRecurFreq;
 
 
@@ -55,11 +55,12 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 
 public class Main_UI extends JFrame {
 
+	private static final long serialVersionUID = 5630737946015469841L;
 	private JPanel contentPane;
-	private JTable table;
 	static int numOfDays;
 	static int realDay, realMonth, realYear, currentDay, currentMonth, currentYear;
-	static ArrayList<Event> events = new ArrayList<Event>();
+	static SQLiteUtility sqliteUtility = new SQLiteUtility();
+	static ArrayList<Event> allEvents = new ArrayList<>();
 	static DefaultListModel eventModel = new DefaultListModel();
 	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
@@ -74,10 +75,16 @@ public class Main_UI extends JFrame {
 	static GregorianCalendar calendar = new GregorianCalendar();
 	static String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
+		
+		try {
+			ArrayList<Event> tempEventList = sqliteUtility.retrieveEventsFromDatabase();
+			if (tempEventList.size() > 0) {
+				allEvents = tempEventList;
+			}
+		} catch (ClassNotFoundException | SQLException e1) {
+			System.out.println("Failed to retrieve events from database. " + e1.toString());
+		}
 		
 		realDay = calendar.get(GregorianCalendar.DAY_OF_MONTH);
 		realMonth = calendar.get(GregorianCalendar.MONTH);
@@ -99,9 +106,7 @@ public class Main_UI extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
+
 	public Main_UI() {
 		setTitle("MyTODOList - The Stupid Simple Scheduler");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -184,6 +189,7 @@ public class Main_UI extends JFrame {
 					}
 					
 					monthLbl.setText(monthNames[currentMonth]);
+					calendarTable.clearSelection();
 					refreshCalendar(currentMonth, currentYear);
 					
 				} else {
@@ -205,6 +211,7 @@ public class Main_UI extends JFrame {
 					}
 					
 					monthLbl.setText(monthNames[currentMonth]);
+					calendarTable.clearSelection();
 					refreshCalendar(currentMonth, currentYear);
 				} else {
 					JOptionPane.showMessageDialog(null, "Sorry, but you can't go ahead more than 5 years.\nPerhaps you should be more present.", "Too far in the future!", JOptionPane.INFORMATION_MESSAGE);
@@ -240,7 +247,7 @@ public class Main_UI extends JFrame {
 		
 		contentPane.add(calendarPanel);
 
-		JList eventList = new JList(events.toArray());
+		JList eventList = new JList(allEvents.toArray());
 		JScrollPane eventListScroll = new JScrollPane(eventList);
 		eventListScroll.setBounds(1040, 80, 240, 440);
 		eventListScroll.setBorder(BorderFactory.createTitledBorder("Events"));
@@ -273,7 +280,9 @@ public class Main_UI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				events.remove(eventList.getSelectedIndex());
+				System.out.println("Deleting event: " + eventList.getSelectedValue());
+//				sqliteUtility.deleteEventFromDatabase();
+				allEvents.remove(eventList.getSelectedIndex());
 				eventDetails.setText("");
 				eventList.clearSelection();
 				deleteBtn.setEnabled(false);
@@ -393,7 +402,12 @@ public class Main_UI extends JFrame {
 						newEvent.setEventFrequency((EventRecurFreq) frequencyList.getSelectedItem());
 					}
 					
-					events.add(newEvent);
+					allEvents.add(newEvent);
+//					try {
+//						sqliteUtility.writeEventToDatabase(newEvent);
+//					} catch (ClassNotFoundException | SQLException e1) {
+//						System.out.println("Failed to write new event to database. " + e1.toString());
+//					}
 					updateEventsList(list);
 					dialog.dispose();
 				}
@@ -429,7 +443,7 @@ public class Main_UI extends JFrame {
 	public static void updateEventsList(JList list) {
 		DefaultListModel tempModel = new DefaultListModel();
 		
-		for (Event event: events) {
+		for (Event event: allEvents) {
 			tempModel.addElement(event);
 		}
 		
