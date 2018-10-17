@@ -292,8 +292,19 @@ public class Main {
 				+ "\n");
 	}
 	
+	//TODO:  Todd's add-on  Tweaks maybe?
 	// Display an ArrayList of Events.
-	public static void displayEvents(ArrayList<Event> events) {}
+	public static void displayEvents(ArrayList<Event> events) {
+		
+		int eventArrayLength = events.size();
+		
+		if(eventArrayLength > 8) {
+			System.out.println("You cannot schedule more than 8 events.");
+		} else {
+			System.out.println("You currently have " + eventArrayLength + " events scheduled");
+		}
+		
+	}
 	
 	// Validate input based upon a provided range.
 	// Returns a zero if the input was invalid.
