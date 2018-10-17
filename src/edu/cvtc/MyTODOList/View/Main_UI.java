@@ -271,6 +271,16 @@ public class Main_UI extends JFrame {
 		JButton updateBtn = new JButton("Update");
 		updateBtn.setBounds(0, 0, 110, 40);
 		eventDetailsButtonPanel.add(updateBtn);
+		updateBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int updtEventIndex = eventList.getSelectedIndex();
+				Event updtEvent = events.get(eventList.getSelectedIndex());
+				updateEventDialog((JFrame) contentPane.getTopLevelAncestor(), eventList, updtEvent, updtEventIndex);
+			}
+			
+		});
 		
 		JButton deleteBtn = new JButton("Delete");
 		deleteBtn.setBounds(130, 0, 110, 40);
@@ -431,6 +441,137 @@ public class Main_UI extends JFrame {
 		inputPanel.add(priorityLabel);
 		inputPanel.add(priority);
 		inputPanel.add(createEventBtn);
+		
+		dialog.setBounds(26, 175, 1100, 400);
+		dialog.getContentPane().add(BorderLayout.CENTER, inputPanel);
+		dialog.pack();
+		dialog.setVisible(true);
+		dialog.setResizable(false);
+		
+	}
+	
+	public static void updateEventDialog(JFrame parent, JList list, Event eventToUpdate, int eventIndex) {
+
+		JDialog dialog = new JDialog(parent, true);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		JPanel inputPanel = new JPanel();
+		inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+		inputPanel.setOpaque(true);
+		
+		JLabel eventNameLabel = new JLabel("Event Name: ");
+		
+		JTextField eventName = new JTextField(30);
+		eventName.setText(eventToUpdate.getEventName());
+		
+		JLabel eventDescLabel = new JLabel("Event Description: ");
+		
+		JTextArea eventDesc = new JTextArea();
+		eventDesc.setWrapStyleWord(true);
+		eventDesc.setText(eventToUpdate.getEventDesc());
+		
+		JLabel eventDateLabel = new JLabel("Event Date:");
+		DatePickerSettings eventDatePickerSettings = new DatePickerSettings();
+		eventDatePickerSettings.setAllowKeyboardEditing(false);
+		DatePicker eventDatePicker = new DatePicker(eventDatePickerSettings);
+		eventDatePicker.setText(eventToUpdate.getEventDate());
+		
+		JLabel eventTimeLabel = new JLabel("Event Time:");
+		TimePickerSettings eventTimeSettings = new TimePickerSettings();
+		eventTimeSettings.setAllowKeyboardEditing(false);
+		TimePicker eventTime = new TimePicker(eventTimeSettings);
+		eventTime.setText(eventToUpdate.getEventTime());
+		
+		JLabel frequencyLabel = new JLabel("How frequently?");
+		JComboBox frequencyList = new JComboBox(Event.EventRecurFreq.values());
+		frequencyList.setEnabled(false);
+		frequencyList.setSelectedItem(eventToUpdate.getEventFrequency());
+		
+		JLabel reoccuringLabel = new JLabel("Reoccuring?");
+		JRadioButton noReoccurBtn = new JRadioButton("Nope");
+		JRadioButton yesReoccurBtn = new JRadioButton("Yep");
+		
+		if(eventToUpdate.isEventRecur()){
+			yesReoccurBtn.setSelected(true);
+		} else {
+			noReoccurBtn.setSelected(true);
+		}
+		
+		noReoccurBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frequencyList.setEnabled(false);
+				
+			}
+		});
+		
+		yesReoccurBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frequencyList.setEnabled(true);
+				
+			}
+		});
+		
+		ButtonGroup reoccurBtnGroup = new ButtonGroup();
+		reoccurBtnGroup.add(noReoccurBtn);
+		reoccurBtnGroup.add(yesReoccurBtn);
+		
+		JLabel priorityLabel = new JLabel("Priority (1: Least important, 10: Most Important)");
+		JSlider priority = new JSlider(JSlider.HORIZONTAL, 1, 10, 5);
+		priority.setMajorTickSpacing(1);
+		priority.setPaintLabels(true);
+		priority.setPaintTicks(true);
+		priority.setSnapToTicks(true);
+		
+		JButton updateEventBtn = new JButton("Update Event!");
+		updateEventBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Event uptEvent = eventToUpdate;
+				
+				if (eventName.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(dialog, "Please provide an event name.", "Missing event name", JOptionPane.ERROR_MESSAGE);
+				} else if (eventDatePicker.toString().isEmpty()){
+					JOptionPane.showMessageDialog(dialog, "Please provide a starting event date.", "Missing event date", JOptionPane.ERROR_MESSAGE);
+				} else {
+					uptEvent.setEventName(eventName.getText());
+					uptEvent.setEventDesc(eventDesc.getText());
+					uptEvent.setEventDate(eventDatePicker.getDate().format(dateFormat).toString());
+					uptEvent.setEventTime(eventTime.getTimeStringOrEmptyString());
+					uptEvent.setEventPriority(priority.getValue());
+					
+					if (yesReoccurBtn.isSelected()) {
+						uptEvent.setEventRecur(true);
+						uptEvent.setEventFrequency((EventRecurFreq) frequencyList.getSelectedItem());
+					}
+					
+					events.set(eventIndex, eventToUpdate);
+					updateEventsList(list);
+					dialog.dispose();
+				}
+
+			}
+		});
+		
+		inputPanel.add(eventNameLabel);
+		inputPanel.add(eventName);
+		inputPanel.add(eventDescLabel);
+		inputPanel.add(eventDesc);
+		inputPanel.add(eventDateLabel);
+		inputPanel.add(eventDatePicker);
+		inputPanel.add(eventTimeLabel);
+		inputPanel.add(eventTime);
+		inputPanel.add(reoccuringLabel);
+		inputPanel.add(noReoccurBtn);
+		inputPanel.add(yesReoccurBtn);
+		inputPanel.add(frequencyLabel);
+		inputPanel.add(frequencyList);
+		inputPanel.add(priorityLabel);
+		inputPanel.add(priority);
+		inputPanel.add(updateEventBtn);
 		
 		dialog.setBounds(26, 175, 1100, 400);
 		dialog.getContentPane().add(BorderLayout.CENTER, inputPanel);
