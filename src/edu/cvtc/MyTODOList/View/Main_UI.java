@@ -83,14 +83,14 @@ public class Main_UI extends JFrame {
 
 	public static void main(String[] args) {
 		
-		try {
-			ArrayList<Event> tempEventList = sqliteUtility.retrieveEventsFromDatabase();
-			if (tempEventList.size() > 0) {
-				allEvents = tempEventList;
-			}
-		} catch (ClassNotFoundException | SQLException e1) {
-			System.out.println("Failed to retrieve events from database. " + e1.toString());
-		}
+//		try {
+//			ArrayList<Event> tempEventList = sqliteUtility.retrieveEventsFromDatabase();
+//			if (tempEventList.size() > 0) {
+//				allEvents = tempEventList;
+//			}
+//		} catch (ClassNotFoundException | SQLException e1) {
+//			System.out.println("Failed to retrieve events from database. " + e1.toString());
+//		}
 		
 		realDay = calendar.get(GregorianCalendar.DAY_OF_MONTH);
 		realMonth = calendar.get(GregorianCalendar.MONTH);

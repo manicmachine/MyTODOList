@@ -23,12 +23,6 @@ import edu.cvtc.MyTODOList.model.Event.EventRecurFreq;
  */
 public class SQLiteUtility {
 
-	// *****Fellow developers: This is the sample DB. Uncomment for use.*****
-	// public static final String SQLITEFILELOCATION = "jdbc:sqlite:/resources/sampleEvent.db";
-																							  
-	// This constant stores the sqlite file location within the projects directory. Comment this out for sample DB use.
-	// public static final String SQLITEFILELOCATION = "jdbc:sqlite:/Users/csather/Google Drive/Programming/eclipse-ee-workspace/MyTODOList/src/edu/cvtc/MyTODOList/resources/event.db";
-	
 	// A constant to store the load driver URL(?)
 	public static final String LOADDRIVER = "org.sqlite.JDBC";
 
@@ -77,10 +71,11 @@ public class SQLiteUtility {
 			while(resultSet.next()){
 
 				// Retrieve by column names
-				e.eventID = resultSet.getInt("EventID");
-				e.eventName = resultSet.getString("EventName");
-				e.eventDate = resultSet.getString("EventDate");
-				e.eventTime = resultSet.getString("EventTime");
+				e.setEventID(resultSet.getInt("EventID"));
+				e.setEventName(resultSet.getString("EventName"));
+				e.setEventDesc(resultSet.getString("EventDesc"));
+				e.setEventDate(resultSet.getString("EventDate"));
+				e.setEventTime(resultSet.getString("EventTime"));
 
 				final int R = resultSet.getInt("EventRecur");
 				if (R == 0) {
@@ -88,31 +83,31 @@ public class SQLiteUtility {
 				} else {
 					e.setEventRecur(true);
 				}
-
+				
 				String erf = resultSet.getString("EventRecurFreq");
 				e.setEventFrequency(EventRecurFreq.valueOf(erf));
-
-				e.eventStart = resultSet.getString("EventStartTime");
-				e.eventEnd = resultSet.getString("EventEndTime");
-
-				e.eventPriority = resultSet.getInt("EventPriority");
-
+						
+				e.setEventStart(resultSet.getString("EventStartTime"));
+				e.setEventEnd(resultSet.getString("EventEndTime"));
+				e.setEventPriority(resultSet.getInt("EventPriority"));
+		
 				final int CTL = resultSet.getInt("EventCountTowardsLimit");
 				if (CTL == 0) {
-					e.eventLimited = false;
+					e.setEventLimited(false);
 				} else {
-					e.eventLimited = true;
+					e.setEventLimited(true);
 				}
 
-				e.eventCategory = resultSet.getString("EventCategory");
+				e.setEventCategory(resultSet.getString("EventCategory"));
+	
 				final int HR = resultSet.getInt("EventHasReminder");
 				if (HR == 0) {
-					e.eventReminder = false;
+					e.setEventReminder(false);
 				} else {
-					e.eventReminder = true;
+					e.setEventReminder(true);
 				}
 
-				e.eventReminderTime = resultSet.getString("EventReminderTime");
+				e.setEventReminderTime(resultSet.getString("EventReminderTime"));
 
 			}
 			connection.commit();
@@ -173,10 +168,11 @@ public class SQLiteUtility {
 
 
 				// Retrieve by column names
-				e.eventID = resultSet.getInt("EventID");
-				e.eventName = resultSet.getString("EventName");
-				e.eventDate = resultSet.getString("EventDate");
-				e.eventTime = resultSet.getString("EventTime");
+				e.setEventID(resultSet.getInt("EventID"));
+				e.setEventName(resultSet.getString("EventName"));
+				e.setEventDesc(resultSet.getString("EventDesc"));
+				e.setEventDate(resultSet.getString("EventDate"));
+				e.setEventTime(resultSet.getString("EventTime"));
 
 				final int R = resultSet.getInt("EventRecur");
 				if (R == 0) {
@@ -185,32 +181,30 @@ public class SQLiteUtility {
 					e.setEventRecur(true);
 				}
 				
-				 
 				String erf = resultSet.getString("EventRecurFreq");
 				e.setEventFrequency(EventRecurFreq.valueOf(erf));
 						
-
-				e.eventStart = resultSet.getString("EventStartTime");
-				e.eventEnd = resultSet.getString("EventEndTime");
-
-				e.eventPriority = resultSet.getInt("EventPriority");
-
+				e.setEventStart(resultSet.getString("EventStartTime"));
+				e.setEventEnd(resultSet.getString("EventEndTime"));
+				e.setEventPriority(resultSet.getInt("EventPriority"));
+		
 				final int CTL = resultSet.getInt("EventCountTowardsLimit");
 				if (CTL == 0) {
-					e.eventLimited = false;
+					e.setEventLimited(false);
 				} else {
-					e.eventLimited = true;
+					e.setEventLimited(true);
 				}
 
-				e.eventCategory = resultSet.getString("EventCategory");
+				e.setEventCategory(resultSet.getString("EventCategory"));
+	
 				final int HR = resultSet.getInt("EventHasReminder");
 				if (HR == 0) {
-					e.eventReminder = false;
+					e.setEventReminder(false);
 				} else {
-					e.eventReminder = true;
+					e.setEventReminder(true);
 				}
 
-				e.eventReminderTime = resultSet.getString("EventReminderTime");
+				e.setEventReminderTime(resultSet.getString("EventReminderTime"));
 
 				// Add event to the events ArrayList
 				events.add(e); 
@@ -323,7 +317,7 @@ public class SQLiteUtility {
 
 
 	// -------------------------------------------------------------------------------------------------------- //
-	// This function updates an Event in the database // - Unfinished
+	// This function updates an Event in the database //
 	// -------------------------------------------------------------------------------------------------------- //
 
 	public static void updateEventInDatabase(Event event) throws SQLException, ClassNotFoundException {
