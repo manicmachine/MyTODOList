@@ -1,4 +1,4 @@
-/**
+/** 
  * 
  */
 package edu.cvtc.MyTODOList.model;
@@ -10,43 +10,33 @@ import java.sql.SQLException;
  * 
  * This Class provides behavior which allows you to connect to the Calendar SQLite Database.
  *
- */
+ **/
 public class SQLiteDBConnection {
-	public static Connection connectDB() {
-		
-		// Create a connection object
-		Connection connection = null;
-		
-		try{
-			// The connection string for the Calendar SQLite Database
-			String url = "jdbc:sqlite:/resources/event.db";
-			
-			// Create a connection to the database
-			connection = DriverManager.getConnection(url);
-			
-			
-			// Success message sent to the console
-			System.out.println("Connection to the SQLite database successful.");
-			
-		// Error handling
-		} 
-		catch (SQLException e) {
-			System.out.println(e.getMessage());
-		} 
-		finally {
-			// If the program is still connected to the DB then close it
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-			} 
-			// Error handling
-			catch(SQLException e) {
-				System.out.print(e.getMessage());
-			}
-		}
-		return connection;
-		
+    public static Connection connectDB() {
 
-	}
+        // Create a connection object
+        Connection connection = null;
+
+        try{
+            // **Fellow developers: This is the sample DB. Uncomment for use.*
+            // final String SQLITEFILELOCATION = "jdbc:sqlite:/resources/sampleEvent.db";
+
+            // This constant stores the sqlite file location within the projects directory. Comment this out for sample DB use.
+            final String SQLITEFILELOCATION = "jdbc:sqlite:/Users/csather/Google Drive/Programming/eclipse-ee-workspace/MyTODOList/src/edu/cvtc/MyTODOList/resources/event.db";
+
+            // Create a connection to the database
+            connection = DriverManager.getConnection(SQLITEFILELOCATION);
+
+
+            // Success message sent to the console
+            System.out.println("Connection to the SQLite database successful.");
+
+        // Error handling
+        } 
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } 
+        return connection;
+
+    }
 }
