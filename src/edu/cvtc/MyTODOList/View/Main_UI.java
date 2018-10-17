@@ -58,13 +58,13 @@ public class Main_UI extends JFrame {
 	private JPanel contentPane;
 	private JTable table;
 	static int numOfDays;
-	static int realDay, realMonth, realYear, currentMonth, currentYear;
+	static int realDay, realMonth, realYear, currentDay, currentMonth, currentYear;
 	static ArrayList<Event> events = new ArrayList<Event>();
 	static DefaultListModel eventModel = new DefaultListModel();
 	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 	static JLabel yearLabel;
-	static JButton previousBtn, nextBtn;
+	static JButton previousBtn, nextBtn, todayBtn;
 	static JTable calendarTable;
 	static JComboBox yearList;
 	static DefaultTableModel calendarModel;
@@ -82,6 +82,7 @@ public class Main_UI extends JFrame {
 		realDay = calendar.get(GregorianCalendar.DAY_OF_MONTH);
 		realMonth = calendar.get(GregorianCalendar.MONTH);
 		realYear = calendar.get(GregorianCalendar.YEAR);
+		currentDay = realDay;
 		currentMonth = realMonth;
 		currentYear = realYear;	
 
@@ -122,6 +123,7 @@ public class Main_UI extends JFrame {
 		yearList = new JComboBox();
 		previousBtn = new JButton("<--");
 		nextBtn = new JButton("-->");
+		todayBtn = new JButton("Today");
 		calendarModel = new DefaultTableModel() {
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -136,6 +138,7 @@ public class Main_UI extends JFrame {
 		calendarPanel.add(yearList);
 		calendarPanel.add(previousBtn);
 		calendarPanel.add(nextBtn);
+		calendarPanel.add(todayBtn);
 		calendarPanel.add(calendarScroll);
 		
 		calendarPanel.setBounds(80, 120, 920, 680);
@@ -143,6 +146,7 @@ public class Main_UI extends JFrame {
 		yearList.setBounds(460 - yearList.getPreferredSize().width / 2, 0, 120, 25);
 		previousBtn.setBounds(10, 0, 50, 25);
 		nextBtn.setBounds(870, 0, 50, 25);
+		todayBtn.setBounds(yearList.getX() + 195, 0, 120, 25);
 		calendarScroll.setBounds(10, 25, 920, 650);
 		
 		for (int i = realYear - 5; i <= realYear + 5; i++) {
@@ -171,16 +175,20 @@ public class Main_UI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (currentMonth == 0) {
-					currentMonth = 11;
-					currentYear -= 1;
+				if (yearList.getSelectedIndex() != 0 || currentMonth != 0) {
+					if (currentMonth == 0) {
+						currentMonth = 11;
+						currentYear -= 1;
+					} else {
+						currentMonth -= 1;
+					}
+					
+					monthLbl.setText(monthNames[currentMonth]);
+					refreshCalendar(currentMonth, currentYear);
+					
 				} else {
-					currentMonth -= 1;
+					JOptionPane.showMessageDialog(null, "Sorry, but you can't go back more than 5 years.\nLeave the past where it is.", "Too far in the past!", JOptionPane.INFORMATION_MESSAGE);
 				}
-				
-				monthLbl.setText(monthNames[currentMonth]);
-				refreshCalendar(currentMonth, currentYear);
-				
 			}
 		});
 		
@@ -188,17 +196,19 @@ public class Main_UI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (currentMonth == 11) {
-					currentMonth = 0;
-					currentYear += 1;
+				if (yearList.getSelectedIndex() != 10 || currentMonth != 11) {
+					if (currentMonth == 11) {
+						currentMonth = 0;
+						currentYear += 1;
+					} else {
+						currentMonth += 1;
+					}
+					
+					monthLbl.setText(monthNames[currentMonth]);
+					refreshCalendar(currentMonth, currentYear);
 				} else {
-					currentMonth += 1;
+					JOptionPane.showMessageDialog(null, "Sorry, but you can't go ahead more than 5 years.\nPerhaps you should be more present.", "Too far in the future!", JOptionPane.INFORMATION_MESSAGE);
 				}
-				
-				monthLbl.setText(monthNames[currentMonth]);
-
-				refreshCalendar(currentMonth, currentYear);
-				
 			}
 		});
 		
@@ -214,30 +224,21 @@ public class Main_UI extends JFrame {
 			}
 		});
 		
-		contentPane.add(calendarPanel);
-//		table = new JTable();
-//		table.setBounds(80, 120, 920, 680);
-//		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		table.setBorder(new EmptyBorder(5, 5, 5, 5));
-//		table.setAlignmentX(Component.LEFT_ALIGNMENT);
-//		table.setAlignmentY(Component.TOP_ALIGNMENT);
-//		table.setModel(new DefaultTableModel(
-//			new Object[][] {
-//				{null, null, null, null, null, null, ""},
-//				{null, null, null, null, null, null, ""},
-//				{null, null, null, null, null, null, null},
-//				{null, null, null, null, null, null, null},
-//				{null, null, null, null, null, null, null}
-//			},
-//			new String[] {
-//				"New column", "New column", "New column", "New column", "New column", "New column", "Events"
-//			}
-//		));
-//		table.setCellSelectionEnabled(true);
-//		table.setBackground(Color.LIGHT_GRAY);
-//		table.setRowHeight(136);
-//		contentPane.add(table);
+		todayBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				currentDay = realDay;
+				currentMonth = realMonth;
+				currentYear = realYear;
+				
+				yearList.setSelectedIndex(5);
+				monthLbl.setText(monthNames[currentMonth]);
+				refreshCalendar(currentDay, currentMonth, currentYear);
+			}
+		});
 		
+		contentPane.add(calendarPanel);
 
 		JList eventList = new JList(events.toArray());
 		JScrollPane eventListScroll = new JScrollPane(eventList);
@@ -456,4 +457,29 @@ public class Main_UI extends JFrame {
 			calendarModel.setValueAt(i, row, column);
 		}
 	}
+	
+	// If a day is provided, change the table selection to the day passed.
+	public static void refreshCalendar(int day, int month, int year) {
+		int numOfDays, startOfMonth;
+		GregorianCalendar newCalendar = new GregorianCalendar(year, month, 1);
+		numOfDays = newCalendar.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+		startOfMonth = newCalendar.get(GregorianCalendar.DAY_OF_WEEK);
+		
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				calendarModel.setValueAt(null, row, col);
+			}
+		}
+		
+		for (int i = 1; i <= numOfDays; i++) {
+			int row = new Integer((i+startOfMonth-2)/7);
+			int column = (i+startOfMonth-2) % 7;
+			calendarModel.setValueAt(i, row, column);
+			if (i == day) {
+				calendarTable.changeSelection(row, column, false, false);
+			}
+		}
+	}
+	
+	
 }
