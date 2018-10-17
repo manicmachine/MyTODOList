@@ -22,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -62,6 +63,7 @@ public class Main_UI extends JFrame {
 	static SQLiteUtility sqliteUtility = new SQLiteUtility();
 	static ArrayList<Event> allEvents = new ArrayList<>();
 	static DefaultListModel eventModel = new DefaultListModel();
+	static JTextArea eventDetails = new JTextArea();
 	static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 	static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
 	static JLabel yearLabel;
@@ -253,7 +255,6 @@ public class Main_UI extends JFrame {
 		eventListScroll.setBorder(BorderFactory.createTitledBorder("Events"));
 		contentPane.add(eventListScroll);
 		
-		JTextArea eventDetails = new JTextArea();
 		eventDetails.setBounds(1040, 600, 240, 150);
 		eventDetails.setEditable(false);
 		eventDetails.setWrapStyleWord(true);
@@ -276,7 +277,7 @@ public class Main_UI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int updtEventIndex = eventList.getSelectedIndex();
-				Event updtEvent = events.get(eventList.getSelectedIndex());
+				Event updtEvent = allEvents.get(eventList.getSelectedIndex());
 				updateEventDialog((JFrame) contentPane.getTopLevelAncestor(), eventList, updtEvent, updtEventIndex);
 			}
 			
@@ -473,7 +474,7 @@ public class Main_UI extends JFrame {
 		DatePickerSettings eventDatePickerSettings = new DatePickerSettings();
 		eventDatePickerSettings.setAllowKeyboardEditing(false);
 		DatePicker eventDatePicker = new DatePicker(eventDatePickerSettings);
-		eventDatePicker.setText(eventToUpdate.getEventDate());
+		eventDatePicker.setDate(LocalDate.parse(eventToUpdate.getEventDate(), dateFormat));
 		
 		JLabel eventTimeLabel = new JLabel("Event Time:");
 		TimePickerSettings eventTimeSettings = new TimePickerSettings();
@@ -548,8 +549,9 @@ public class Main_UI extends JFrame {
 						uptEvent.setEventFrequency((EventRecurFreq) frequencyList.getSelectedItem());
 					}
 					
-					events.set(eventIndex, eventToUpdate);
+					allEvents.set(eventIndex, eventToUpdate);
 					updateEventsList(list);
+					eventDetails.setText("");
 					dialog.dispose();
 				}
 
